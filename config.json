@@ -1,0 +1,56 @@
+{
+    "name": "CBC Confirm Patient Data",
+    "description": "Display data from another project",
+    "namespace": "CBC\\ExternalModule",
+    "framework-version": 4,
+    "redcap-version-min": "9.7.8",
+    "permissions": [
+        "redcap_data_entry_form_top",
+        "redcap_every_page_top"
+    ],
+    "authors": [
+        {
+            "name": "University of Florida CTS-IT",
+            "email": "CTSIT-REDCAP-MODULE-SUPPO@LISTS.UFL.EDU",
+            "institution": "University of Florida - CTSI"
+        }
+    ],
+    "project-settings": [
+        {
+            "key": "target_pid",
+            "name": "Project you wish to search",
+            "type": "project-id",
+            "autocomplete": true
+        },
+        {
+            "key": "limit_fields",
+            "name": "Limit fields to search</br>(improves performance with large source projects)",
+            "type": "checkbox"
+        },
+        {
+            "key": "codebook_shortcuts",
+            "name": "Codebook shortcuts",
+            "type": "descriptive"
+        },
+        {
+            "key": "enabled_forms",
+            "name": "Enabled Forms",
+            "type": "sub_settings",
+            "repeatable": true,
+            "sub_settings": [
+                {
+                    "key": "show_on_form",
+                    "name": "Show in this form",
+                    "type": "form-list",
+                    "autocomplete": true
+                },
+                {
+                    "key": "mapping",
+                    "name": "JSON array of fields from source project",
+                    "type": "textarea",
+                    "autocomplete": true
+                }
+            ]
+        }
+    ]
+}
