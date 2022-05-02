@@ -1,7 +1,5 @@
 # Confirm Patient Data
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4251176.svg)](https://doi.org/10.5281/zenodo.4251176)
-
 A REDCap Module to search another project for data to ~populate data into~ display in the current form. This module is a hack of[Search and Populate Data from Another Project](https://github.com/ctsit/search_and_populate_data_from_another_project) intended to verify data in a satellite study.
 
 ## Limitations
@@ -9,9 +7,6 @@ This module does not support source projects which have multiple arms. All queri
 
 ## Prerequisites
 - REDCap >= 9.7.8
-
-## Easy Installation
-- Obtain this module from the Consortium [REDCap Repo](https://redcap.vanderbilt.edu/consortium/modules/index.php) from the control center.
 
 ## Manual Installation
 - Clone this repo into `<redcap-root>/modules/cbc_confirm_patient_data_v0.0.0`.

@@ -183,7 +183,7 @@ class ExternalModule extends AbstractExternalModule {
     }
 
     protected function setJsSettings($settings) {
-        echo '<script>CBCCPD = ' . json_encode($settings) . ';</script>';
+        echo '<script>CBCPD = ' . json_encode($settings) . ';</script>';
     }
 
     function digNestedData( $subject_data_array, $key ) {
