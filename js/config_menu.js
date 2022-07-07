@@ -8,8 +8,9 @@ const sample_map = JSON.stringify(
         2
         );
 $(document).ready(function() {
-    const source_codebook = `<a target='_blank' href='${app_path_webroot_full}${app_path_webroot.slice(1)}Design/data_dictionary_codebook.php?pid=${STPipe.sourceProjectId}'><button>Source codebook</button></a>`;
-    const target_codebook = `<a target='_blank' href='${app_path_webroot_full}${app_path_webroot.slice(1)}Design/data_dictionary_codebook.php?pid=${STPipe.thisProjectId}'><button>Target codebook</button></a>`;
+    print('ready');
+    const source_codebook = `<a target='_blank' href='${app_path_webroot_full}${app_path_webroot.slice(1)}Design/data_dictionary_codebook.php?pid=${CBCPD.sourceProjectId}'><button>Source codebook</button></a>`;
+    const target_codebook = `<a target='_blank' href='${app_path_webroot_full}${app_path_webroot.slice(1)}Design/data_dictionary_codebook.php?pid=${CBCPD.thisProjectId}'><button>Target codebook</button></a>`;
     var $modal = $('#external-modules-configure-modal');
     var lastHoveredProjectID;
 
@@ -37,7 +38,7 @@ $(document).ready(function() {
     }
 
     $modal.on('show.bs.modal', function() {
-        if ( $(this).data('module') != STPipe.modulePrefix ) {
+        if ( $(this).data('module') != CBCPD.modulePrefix ) {
             return;
         }
 
@@ -47,7 +48,7 @@ $(document).ready(function() {
 
         ExternalModules.Settings.prototype.resetConfigInstances = function() {
             ExternalModules.Settings.prototype.resetConfigInstancesOld();
-            if ( $modal.data('module') != STPipe.modulePrefix ) {
+            if ( $modal.data('module') != CBCPD.modulePrefix ) {
                 return;
             }
             // Force the descriptive field to show codebook buttons
