@@ -8,6 +8,7 @@ $instrument = $_REQUEST['instrument'];
 
 $EM = new ExternalModule();
 
-echo json_encode($EM->getPersonInfo($record_id, $instrument));
+$caregiver_data = $EM->getCaregiverInfo($record_id, $instrument);
+echo json_encode($caregiver_data);
 
 ?>

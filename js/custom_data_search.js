@@ -45,28 +45,25 @@ $(document).ready(function () {
 
     // Add on-click listener to demographic check button
     $('#Check').on('click', () => {
-        showPatientInfo()
+        // `recordId` is the equivalent of
+        const recordId = $($('#ptid-tr').find('input')[0]).val()
+        getCaregiverInfo(recordId);
     });
 });
 
-function showPatientInfo() {
-    // FIXME
-    let id = $($('#ptid-tr').find('input')[0]).val()
-    ajaxGet(id);
-}
-
-function ajaxGet(record_id) {
+// `GET` Caregiver demographic data from `ajaxpage.php`
+const getCaregiverInfo = function(recordId) {
     const urlParams = new URLSearchParams(window.location.search);
     $.get({
         url: CBCPD.ajaxpage,
         data: {
-            recordId: record_id,
+            recordId: recordId,
             instrument: urlParams.get('page')
         },
     })
         .done(function (data) {
-            response_data = JSON.parse(data);
-            showDataConfirmModal(response_data);
+            responseData = JSON.parse(data);
+            showDataConfirmModal(responseData);
         });
 }
 

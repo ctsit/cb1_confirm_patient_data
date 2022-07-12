@@ -76,7 +76,10 @@ class ExternalModule extends AbstractExternalModule {
         echo '</br>';
     }
 
-    function getPersonInfo($record_id, $instrument) {
+    // which id do they have?	
+    //     - Is it the ADC Subject ID aka record ID?
+    // need to search all records
+    function getCaregiverInfo($record_id, $instrument) {
 
         if (!$record_id | !$instrument) return false;
 
