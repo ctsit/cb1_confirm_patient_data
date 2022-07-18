@@ -45,8 +45,8 @@ $(document).ready(function () {
 
     // Add on-click listener to demographic check button
     $('#Check').on('click', () => {
-        // `recordId` is the equivalent of
-        const recordId = $($('#ptid-tr').find('input')[0]).val()
+        // `recordId` is the equivalent of ADC Subject ID for the ADRC project
+        const recordId = $('#record_id-tr > td:last-child').text();
         getCaregiverInfo(recordId);
     });
 });
