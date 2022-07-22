@@ -90,9 +90,6 @@ class ExternalModule extends AbstractExternalModule
         echo '</br>';
     }
 
-    // which id do they have?	
-    //     - Is it the ADC Subject ID aka record ID?
-    // need to search all records
     function getCaregiverInfo($record_id, $instrument)
     {
 
@@ -154,34 +151,14 @@ class ExternalModule extends AbstractExternalModule
 
         // replace coded field name with display name for UI
         foreach ($source_fields_mapping as $field_id => $field_attributes) {
-            $field_value = $source_person_data[$field_id];
-
+            $field_value = isset($source_person_data[$field_id]) ? $source_person_data[$field_id] : '';
             $field_label = $field_attributes['field_label'];
             $field_type = $field_attributes['field_type'];
 
-            // select_choices_or_calculations
-            // "1, 1 Male|2, 2 Female"
-            // "0, 0 No (If No, <b>SKIP TO QUESTION 4</b>)|1, 1 Yes|9, 9 Unknown (If Unknown, <b>SKIP TO QUESTION 4</b>)"
-            // Grab the user friendly value
-            $field_choices = explode('|', $field_attributes['select_choices_or_calculations']);
-
-            // iterate over $field_choices and explode each entry and push
-            // then find the matching index via in_array($field_value, $short_values)
-            // then $source_person_data[$field_label] = $field_choice_long_values[$found_index]
-            $field_choice_short_values = [];
-            $field_choice_long_values = [];
-            foreach ($field_choices as &$choice) {
-                list($short_value, $long_value) = explode(',', $choice);
-                array_push($field_choice_short_values, $short_value);
-                array_push($field_choice_long_values, $long_value);
-            }
-
-            $choice_index = array_search($field_value, $field_choice_short_values);
             // if a dropdown then add to field_labels to array
-            if ($field_type == 'dropdown' || $field_type == 'radio') {
-                $field_value = $field_choice_long_values[$choice_index];
+            if ($field_value != '' && $field_type == 'dropdown' || $field_type == 'radio') {
+                $field_value = $this->get_select_choice_full_field_equivalent($field_value, $field_attributes['select_choices_or_calculations']);
             }
-
 
             $source_person_data[$field_label] = $field_value;
             unset($source_person_data[$field_id]);
@@ -190,51 +167,82 @@ class ExternalModule extends AbstractExternalModule
         return $source_person_data;
     }
 
+    /**
+     * Returns the full value equivalent of the coded field value
+     * 
+     * @param string $needle The coded field value to search for
+     * @param string $select_choices The `select_choices_or_calculations` of a field
+     * @return string
+     */
+    private function get_select_choice_full_field_equivalent(string $needle, string $select_choices): string
+    {
+        // `select_choices_or_calculations` are '|' delimeted. Two samples are:
+        // "1, 1 Male|2, 2 Female"
+        // "0, 0 No (If No, <b>SKIP TO QUESTION 4</b>)|1, 1 Yes|9, 9 Unknown (If Unknown, <b>SKIP TO QUESTION 4</b>)"
+        $exploded_select_choices = explode('|', $select_choices);
+
+        // Iterate over all select choices and create two arrays for quick lookup
+        // A select choice has the format of: "1, 1 Male".
+        // The data in front of the "," is the coded value and the data after is the full value
+        $select_choices_coded_values = [];
+        $select_choices_full_values = [];
+        foreach ($exploded_select_choices as &$choice) {
+            list($coded_value, $full_value) = explode(',', $choice);
+            array_push($select_choices_coded_values, $coded_value);
+            array_push($select_choices_full_values, $full_value);
+        }
+
+        $index = array_search($needle, $select_choices_coded_values);
+
+        // Return the full value equivalent
+        return $select_choices_full_values[$index];
+    }
+
     // Copied nearly exactly from the DataQuality class because it's a private function
     // TODO: utilize DateTimeRC::datetimeConvert, but this does all the lifting
-    private function convertDateFormat($field, $value)
-    {
-        global $Proj;
-        // Get field validation type, if exists
-        $valType = $Proj->metadata[$field]['element_validation_type'];
-        // If field is a date[time][_seonds] field with MDY or DMY formatted, then reformat the displayed date for consistency
-        if (
-            $value != '' && !is_array($value) && substr($valType, 0, 4) == 'date'
-            && (substr($valType, -4) == '_mdy' || substr($valType, -4) == '_dmy')
-        ) {
-            // Get array of all available validation types
-            $valTypes = getValTypes();
-            $valTypes['date_mdy']['regex_php'] = $valTypes['date_ymd']['regex_php'];
-            $valTypes['date_dmy']['regex_php'] = $valTypes['date_ymd']['regex_php'];
-            $valTypes['datetime_mdy']['regex_php'] = $valTypes['datetime_ymd']['regex_php'];
-            $valTypes['datetime_dmy']['regex_php'] = $valTypes['datetime_ymd']['regex_php'];
-            $valTypes['datetime_seconds_mdy']['regex_php'] = $valTypes['datetime_seconds_ymd']['regex_php'];
-            $valTypes['datetime_seconds_dmy']['regex_php'] = $valTypes['datetime_seconds_ymd']['regex_php'];
-            // Set regex pattern to use for this field
-            $regex_pattern = $valTypes[$valType]['regex_php'];
-            // Run the value through the regex pattern
-            preg_match($regex_pattern, $value, $regex_matches);
-            // Was it validated? (If so, will have a value in 0 key in array returned.)
-            $failed_regex = (!isset($regex_matches[0]));
-            if ($failed_regex) return $value;
-            // Dates
-            if ($valType == 'date_mdy') {
-                $value = \DateTimeRC::date_ymd2mdy($value);
-            } elseif ($valType == 'date_dmy') {
-                $value = \DateTimeRC::date_ymd2dmy($value);
-            } else {
-                // Datetime and Datetime seconds
-                list($this_date, $this_time) = explode(" ", $value);
-                if ($valType == 'datetime_mdy' || $valType == 'datetime_seconds_mdy') {
-                    $value = trim(\DateTimeRC::date_ymd2mdy($this_date) . " " . $this_time);
-                } elseif ($valType == 'datetime_dmy' || $valType == 'datetime_seconds_dmy') {
-                    $value = trim(\DateTimeRC::date_ymd2dmy($this_date) . " " . $this_time);
-                }
-            }
-        }
-        // Return the value
-        return $value;
-    }
+    // private function convertDateFormat($field, $value)
+    // {
+    //     global $Proj;
+    //     // Get field validation type, if exists
+    //     $valType = $Proj->metadata[$field]['element_validation_type'];
+    //     // If field is a date[time][_seonds] field with MDY or DMY formatted, then reformat the displayed date for consistency
+    //     if (
+    //         $value != '' && !is_array($value) && substr($valType, 0, 4) == 'date'
+    //         && (substr($valType, -4) == '_mdy' || substr($valType, -4) == '_dmy')
+    //     ) {
+    //         // Get array of all available validation types
+    //         $valTypes = getValTypes();
+    //         $valTypes['date_mdy']['regex_php'] = $valTypes['date_ymd']['regex_php'];
+    //         $valTypes['date_dmy']['regex_php'] = $valTypes['date_ymd']['regex_php'];
+    //         $valTypes['datetime_mdy']['regex_php'] = $valTypes['datetime_ymd']['regex_php'];
+    //         $valTypes['datetime_dmy']['regex_php'] = $valTypes['datetime_ymd']['regex_php'];
+    //         $valTypes['datetime_seconds_mdy']['regex_php'] = $valTypes['datetime_seconds_ymd']['regex_php'];
+    //         $valTypes['datetime_seconds_dmy']['regex_php'] = $valTypes['datetime_seconds_ymd']['regex_php'];
+    //         // Set regex pattern to use for this field
+    //         $regex_pattern = $valTypes[$valType]['regex_php'];
+    //         // Run the value through the regex pattern
+    //         preg_match($regex_pattern, $value, $regex_matches);
+    //         // Was it validated? (If so, will have a value in 0 key in array returned.)
+    //         $failed_regex = (!isset($regex_matches[0]));
+    //         if ($failed_regex) return $value;
+    //         // Dates
+    //         if ($valType == 'date_mdy') {
+    //             $value = \DateTimeRC::date_ymd2mdy($value);
+    //         } elseif ($valType == 'date_dmy') {
+    //             $value = \DateTimeRC::date_ymd2dmy($value);
+    //         } else {
+    //             // Datetime and Datetime seconds
+    //             list($this_date, $this_time) = explode(" ", $value);
+    //             if ($valType == 'datetime_mdy' || $valType == 'datetime_seconds_mdy') {
+    //                 $value = trim(\DateTimeRC::date_ymd2mdy($this_date) . " " . $this_time);
+    //             } elseif ($valType == 'datetime_dmy' || $valType == 'datetime_seconds_dmy') {
+    //                 $value = trim(\DateTimeRC::date_ymd2dmy($this_date) . " " . $this_time);
+    //             }
+    //         }
+    //     }
+    //     // Return the value
+    //     return $value;
+    // }
 
     protected function includeJs($file)
     {
