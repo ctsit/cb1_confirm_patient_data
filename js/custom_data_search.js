@@ -13,9 +13,12 @@ function showDataConfirmModal(json) {
   // clear the rows from any previous search
   $('#body-for-stp-modal').empty();
 
-  for (const [key, value] of Object.entries(json)) {
+  for (const person of json) {
+    $('#body-for-stp-modal').append('<tr><td><h1>Person</h1></td></tr>');
+    for (const [key, value] of Object.entries(person)) {
     // Add the rows from the current search
-    $('#body-for-stp-modal').append(`<tr><td>${key}</td><td>${value}</td></tr>`);
+      $('#body-for-stp-modal').append(`<tr><td>${key}</td><td>${value}</td></tr>`);
+    }
   }
 }
 

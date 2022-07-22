@@ -123,11 +123,8 @@ class ExternalModule extends AbstractExternalModule
         }
         */
 
-        // eliminate event-level of array and promote fields
-        $all_person_data = array_merge_recursive($redcap_data[$record_id]);
-
-        $source_person_data = $all_person_data[0]; // only data from non-repeat events
-
+        $all_person_data = array_filter(array_merge_recursive($redcap_data[$record_id]));
+        $unique_persons = array_unique($all_person_data, SORT_REGULAR);
 
         // translate coded names to labels
         $source_fields_mapping = \MetaData::getDataDictionary(/*$returnFormat= */
@@ -149,26 +146,37 @@ class ExternalModule extends AbstractExternalModule
             /*$delimiter=','*/
         );
 
-        // replace coded field name with display name for UI
-        foreach ($source_fields_mapping as $field_id => $field_attributes) {
-            $field_value = isset($source_person_data[$field_id]) ? $source_person_data[$field_id] : '';
-            $field_label = $field_attributes['field_label'];
-            $field_type = $field_attributes['field_type'];
+        // TODO(mbentz-uf): Determine unique persons and return an array of persons.
+        // The loop is wrong. Instead of looping through all source field mappings it should be used as a lookup instead
+        // Start here! Revisit if nested loop can be removed.
+        foreach ($unique_persons as $index => $person) {
+            // replace coded field value with full field value
+            foreach ($source_fields_mapping as $field_id => $field_attributes) {
+                $field_value = $person[$field_id];
 
-            // if a dropdown then add to field_labels to array
-            if ($field_value != '' && $field_type == 'dropdown' || $field_type == 'radio') {
-                $field_value = $this->get_select_choice_full_field_equivalent($field_value, $field_attributes['select_choices_or_calculations']);
+                if (!isset($field_value)) {
+                    continue;
+                }
+
+                $field_label = $field_attributes['field_label'];
+                $field_type = $field_attributes['field_type'];
+
+                // if a dropdown then add to field_labels to array
+                if ($field_value != '' && $field_type == 'dropdown' || $field_type == 'radio') {
+                    $field_value = $this->get_select_choice_full_field_equivalent($field_value, $field_attributes['select_choices_or_calculations']);
+                }
+
+                $unique_persons[$index][$field_label] = $field_value;
+                unset($unique_persons[$index][$field_id]);
             }
-
-            $source_person_data[$field_label] = $field_value;
-            unset($source_person_data[$field_id]);
         }
 
-        return $source_person_data;
+
+        return $unique_persons;
     }
 
     /**
-     * Returns the full value equivalent of the coded field value
+     * Returns the full field value equivalent of the coded field value
      * 
      * @param string $needle The coded field value to search for
      * @param string $select_choices The `select_choices_or_calculations` of a field
