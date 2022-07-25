@@ -20,12 +20,8 @@
             "key": "target_pid",
             "name": "Project you wish to search",
             "type": "project-id",
+            "required": true,
             "autocomplete": true
-        },
-        {
-            "key": "limit_fields",
-            "name": "Limit fields to search</br>(improves performance with large source projects)",
-            "type": "checkbox"
         },
         {
             "key": "codebook_shortcuts",
@@ -42,11 +38,21 @@
                     "key": "show_on_form",
                     "name": "Show in this form",
                     "type": "form-list",
+                    "required": true,
+                    "autocomplete": true
+                },
+                {
+                    "key": "adc_subject_id",
+                    "name": "ADC Subject ID (ptid) field",
+                    "type": "field-list",
+                    "required": true,
+                    "repeatable": false,
                     "autocomplete": true
                 },
                 {
                     "key": "mapping",
                     "name": "JSON array of fields from source project",
+                    "required": true,
                     "type": "textarea",
                     "autocomplete": true
                 }

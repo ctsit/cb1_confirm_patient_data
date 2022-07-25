@@ -13,6 +13,7 @@ class ExternalModule extends AbstractExternalModule
 
     function redcap_every_page_top($project_id)
     {
+        // TODO(mbentz-uf): Verify if this is necessary
         if ($project_id && strpos(PAGE, 'ExternalModules/manager/project.php') !== false) {
             $this->setJsSettings([
                 'modulePrefix' => $this->PREFIX,
@@ -31,58 +32,12 @@ class ExternalModule extends AbstractExternalModule
         if (!in_array($instrument, (array) $this->framework->getProjectSetting('show_on_form'))) return;
         $target_pid = $this->framework->getProjectSetting('target_pid');
 
-        // collect source project's field labels if needed
-        $source_fields_mapping = [];
-        if ($this->getProjectSetting('limit_fields')) {
-            $source_fields = $this->fetchMappings($instrument);
-            // $source_fields = array_keys($mapping);
-
-            /* FIXME: EM query does not like field_name IN
-             * mysqli_result object is not behaving with fetch_all
-             */
-            // $sql = "SELECT field_name, element_label
-            //     FROM redcap_metadata
-            //     WHERE project_id = ?
-            //         AND field_name IN (?)";
-            // $source_fields_mapping = $this->framework->
-            //                        query($sql,
-            //                              [$target_pid,
-            //                               implode(",`", $source_fields)
-            //                              ]
-            //                        )->fetch_all(MYSQLI_ASSOC);
-
-            // HACK: fetch the entire data dictionary just to get the field labels
-            // TODO: replace this with direct query for better performance
-            $source_fields_mapping = \MetaData::getDataDictionary(/*$returnFormat= */
-                'array',
-                /*$returnCsvLabelHeaders= */
-                true,
-                /*$fields= */
-                $source_fields,
-                /*$forms= */
-                array(),
-                /*$isMobileApp= */
-                false,
-                /*$draft_mode= */
-                false,
-                /*$revision_id= */
-                null,
-                /*$project_id_override= */
-                $target_pid
-                /*$delimiter=','*/
-            );
-
-            foreach ($source_fields_mapping as $k => $v) {
-                $source_fields_mapping[$k] = $v['field_label'];
-            }
-        }
-
         $this->setJsSettings([
             'target_pid' => $target_pid,
             'ajaxpage' => $this->framework->getUrl('ajaxpage.php'),
-            'limit_fields' => $this->framework->getProjectSetting('limit_fields'),
-            'source_fields_mapping' => $source_fields_mapping
+            'adcSubjectId' => $this->framework->getProjectSetting('adc_subject_id')[0],
         ]);
+
         $this->includeJs('js/custom_data_search.js');
         // DataEntry::renderSearchUtility();
 
@@ -259,7 +214,7 @@ class ExternalModule extends AbstractExternalModule
 
     protected function setJsSettings($settings)
     {
-        echo '<script>CBCPD = ' . json_encode($settings) . ';</script>';
+        echo '<script>CB1 = ' . json_encode($settings) . ';</script>';
     }
 
     function digNestedData($subject_data_array, $key)

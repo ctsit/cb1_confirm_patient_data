@@ -1,9 +1,9 @@
+/* eslint-disable no-restricted-syntax */
 /**
  *
  * @param {string} copyData
  */
 function showDataConfirmModal(json) {
-  // const caregiverDemographics = JSON.parse(json);
   // show the modal
   $('#dialog-data-stp').dialog('open');
 
@@ -11,14 +11,32 @@ function showDataConfirmModal(json) {
   // $('#dialog-data-stp').data('copyData', copyData);
 
   // clear the rows from any previous search
-  $('#body-for-stp-modal').empty();
+  $('#stp-modal-table').empty();
 
-  for (const person of json) {
-    $('#body-for-stp-modal').append('<tr><td><h1>Person</h1></td></tr>');
-    for (const [key, value] of Object.entries(person)) {
+  for (const [index, person] of json.entries()) {
+    $('#stp-modal-table').append(`
+      <thead>
+          <th>Caregiver ${index + 1}: Field</th>
+          <th>Value</th>
+      </thead>
+      <tbody id='caregiver-${index}'></tbody>
+    `);
+
     // Add the rows from the current search
-      $('#body-for-stp-modal').append(`<tr><td>${key}</td><td>${value}</td></tr>`);
+    for (const [key, value] of Object.entries(person)) {
+      $(`#caregiver-${index}`).append(`
+        <tr>
+          <td>${key}</td>
+          <td>${value}</td>
+        </tr>
+      `);
     }
+
+    // Add spacing
+    $('#stp-modal-table').append(`
+      <br>
+      <br>
+    `);
   }
 }
 
@@ -26,7 +44,7 @@ function showDataConfirmModal(json) {
 const getCaregiverInfo = (recordId) => {
   const urlParams = new URLSearchParams(window.location.search);
   $.get({
-    url: CBCPD.ajaxpage,
+    url: CB1.ajaxpage,
     data: {
       recordId,
       instrument: urlParams.get('page'),
@@ -39,18 +57,6 @@ const getCaregiverInfo = (recordId) => {
 };
 
 $(document).ready(() => {
-  // TODO(mbentz-uf): learn what these lines do
-  if (CBCPD.limit_fields) {
-    // field selector options are initially for the target, not source project
-    // replace them with only those defined in the project config
-    $('#field_select').empty();
-    $.each(CBCPD.source_fields_mapping, (key, label) => {
-      $('#field_select').append($('<option></option>').val(key).html(label));
-    });
-  } else {
-    $('#field_select').parent().parent().hide();
-  }
-
   // setting up the dialog for the search confirmation before copying
   $('#dialog-data-stp').dialog({
     autoOpen: false,
@@ -67,17 +73,21 @@ $(document).ready(() => {
     },
   });
 
-  // TODO(mbentz-uf): make this configurable
-  // Insert a button to check demographics
-  $('#form-title').after(
-    // $('#form_menu_description_label').after(
+  const jqTitleRow = $('#contextMsg > div');
+
+  // TODO(mbentz-uf): Replace hardcoded margin percentage with flex-box
+  jqTitleRow.append(
     $('<button />')
-      .html('Check')
+      .html('Verify Caregiver')
+      .css(
+        {
+          'margin-left': '60%',
+        },
+      )
       .attr(
         {
           type: 'button',
           id: 'Check',
-          onlcick: 'showPatientInfo()',
           class: 'btn btn-info btn-sm',
         },
       ),
@@ -86,32 +96,11 @@ $(document).ready(() => {
   // Add on-click listener to demographic check button
   $('#Check').on('click', () => {
     // `recordId` is the equivalent of ADC Subject ID for the ADRC project
-    const recordId = $('#ptid-tr input').val();
+    const { adcSubjectId } = CB1;
+    const recordId = $(`#${adcSubjectId}-tr input`).val();
     getCaregiverInfo(recordId);
   });
 });
-
-// function pasteValues (values) {
-//   console.log(values)
-//   // for (let [key, value] of Object.entries(values)) {
-//   //     let $target_field = $(`input[name='${key}']`);
-//   //     if ($target_field.length == 0) {
-//   //         // not found by name attr, field may be present as a dropdown
-//   //         selectFromDropdown(key, value);
-//   //     }
-//   //     // radio and regular text boxes
-//   //     if ($target_field.attr('class') == 'hiddenradio') {
-//   //         // collect all radio fields in all layouts
-//   //         let $inputs = $target_field.siblings('[class*="choice"]');
-//   //         // select radio assuming target coded value matches source coded value
-//   //         $inputs.find(`[value='${value}']`).click();
-//   //     } else {
-//   //         // FIXME: does not honor desired date formatting
-//   //         $target_field.val(`${value}`);
-//   //         $target_field.blur();
-//   //     }
-//   // }
-// }
 
 // function selectFromDropdown (key, value) {
 //   const $targetRow = $(`tr[sq_id='${key}']`)
