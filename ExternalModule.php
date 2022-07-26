@@ -158,7 +158,7 @@ class ExternalModule extends AbstractExternalModule
         $index = array_search($needle, $select_choices_coded_values);
 
         // Return the full value equivalent
-        return $select_choices_full_values[$index];
+        return preg_replace('/\d{1,}\s{1}/', '', $select_choices_full_values[$index]);
     }
 
     // Copied nearly exactly from the DataQuality class because it's a private function
