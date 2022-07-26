@@ -16,7 +16,7 @@ function showDataConfirmModal(json) {
   for (const [index, person] of json.entries()) {
     $('#stp-modal-table').append(`
       <thead>
-          <th>Caregiver ${index + 1}: Field</th>
+          <th>Caregiver ${index + 1} Demographics</th>
           <th>Value</th>
       </thead>
       <tbody id='caregiver-${index}'></tbody>
@@ -98,6 +98,11 @@ $(document).ready(() => {
     // `recordId` is the equivalent of ADC Subject ID for the ADRC project
     const { adcSubjectId } = CB1;
     const recordId = $(`#${adcSubjectId}-tr input`).val();
+    if (!recordId) {
+      alert('ADC Subject ID (ptid) is required.');
+      return;
+    }
+
     getCaregiverInfo(recordId);
   });
 });
