@@ -23,3 +23,22 @@ Access **Manage External Modules** section of your project, click on _Search and
 - **Enabled forms**
     - **Show in this form**: The instrument the following mapping will be applied to.
     - **JSON array of fields from source project**: JSON array of `source_field_names` from the source project to display to users in your current project.
+
+## Diagrams
+
+### Sequence Diagrams
+```mermaid
+    sequenceDiagram
+    ExternalModule.php-->>ExternalModule.php:redcap_data_entry_form_top()
+    Note right of ExternalModule.php:includeJs('js/config_menu.js')
+    Note right of ExternalModule.php:include('data_confirm_modal.html')
+    ExternalModule.php->>custom_data_search.js:Insert custom_data_search.js into DOM
+    custom_data_search.js-->>custom_data_search.js:$(document).ready()
+    Note right of custom_data_search.js:Add 'Verify Caregiver' button to DOM with on click event listener
+    custom_data_search.js-->>custom_data_search.js:'Verify Caregiver' button on click
+    custom_data_search.js->>ajaxpage.php:getCaregiverInfo(recordId)
+    ajaxpage.php-->>ExternalModule.php:getCaregiverInfo($record_id, $instrument)
+    ExternalModule.php->>ajaxpage.php:Array of unique caregivers
+    ajaxpage.php-->>custom_data_search.js:JSON of array of unique caregivers
+    custom_data_search.js-->>custom_data_search.js:Display modal with caregivers
+```
