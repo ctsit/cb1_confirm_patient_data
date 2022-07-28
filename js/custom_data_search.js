@@ -87,14 +87,14 @@ $(document).ready(() => {
       .attr(
         {
           type: 'button',
-          id: 'Check',
+          id: 'verify-caregiver',
           class: 'btn btn-info btn-sm',
         },
       ),
   );
 
   // Add on-click listener to demographic check button
-  $('#Check').on('click', () => {
+  $('#verify-caregiver').on('click', () => {
     // `recordId` is the equivalent of ADC Subject ID for the ADRC project
     const { adcSubjectId } = CB1;
     const recordId = $(`#${adcSubjectId}-tr input`).val();
