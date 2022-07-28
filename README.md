@@ -29,16 +29,20 @@ Access **Manage External Modules** section of your project, click on _Search and
 ### Sequence Diagrams
 ```mermaid
     sequenceDiagram
+    REDCap-->>ExternalModule.php:User adds/edits record
     ExternalModule.php-->>ExternalModule.php:redcap_data_entry_form_top()
+    Note right of ExternalModule.php:Lifecycle hook triggered
     Note right of ExternalModule.php:includeJs('js/config_menu.js')
     Note right of ExternalModule.php:include('data_confirm_modal.html')
-    ExternalModule.php->>custom_data_search.js:Insert custom_data_search.js into DOM
+    ExternalModule.php->>REDCap:Insert custom_data_search.js and data_confirm_modal.html into REDCap
+    REDCap-->>custom_data_search.js:Page load
     custom_data_search.js-->>custom_data_search.js:$(document).ready()
-    Note right of custom_data_search.js:Add 'Verify Caregiver' button to DOM with on click event listener
-    custom_data_search.js-->>custom_data_search.js:'Verify Caregiver' button on click
+    Note right of custom_data_search.js:Page load event listener is triggered
+    custom_data_search.js->>REDCap:Add 'Verify Caregiver' to REDCap with on click event listener
+    REDCap-->>custom_data_search.js:'Verify Caregiver' button on click
     custom_data_search.js->>ajaxpage.php:getCaregiverInfo(recordId)
     ajaxpage.php-->>ExternalModule.php:getCaregiverInfo($record_id, $instrument)
     ExternalModule.php->>ajaxpage.php:Array of unique caregivers
     ajaxpage.php-->>custom_data_search.js:JSON of array of unique caregivers
-    custom_data_search.js-->>custom_data_search.js:Display modal with caregivers
+    custom_data_search.js-->>REDCap:Update modal with caregivers and display
 ```
