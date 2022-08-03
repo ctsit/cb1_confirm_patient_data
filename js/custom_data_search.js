@@ -4,47 +4,50 @@
  * @param {string} copyData
  */
 function showDataConfirmModal(json) {
-  // show the modal
   $('#dialog-data-stp').dialog('open');
-
-  // hold onto the data in its current form
-  // $('#dialog-data-stp').data('copyData', copyData);
 
   // clear the rows from any previous search
   $('#stp-modal-table').empty();
 
-  for (const [index, person] of json.entries()) {
-    $('#stp-modal-table').append(`
+  if (json) {
+    for (const [index, person] of json.entries()) {
+    // <th>Patient ${index + 1} Demographics</th>
+      $('#stp-modal-table').append(`
       <thead>
-          <th>Caregiver ${index + 1} Demographics</th>
+          <th>Patient Demographics</th>
           <th>Value</th>
       </thead>
-      <tbody id='caregiver-${index}'></tbody>
+      <tbody id='patient-${index}'></tbody>
     `);
 
-    // Add the rows from the current search
-    for (const [key, value] of Object.entries(person)) {
-      $(`#caregiver-${index}`).append(`
+      // Add the rows from the current search
+      for (const [key, value] of Object.entries(person)) {
+        $(`#patient-${index}`).append(`
         <tr>
           <td>${key}</td>
           <td>${value}</td>
         </tr>
       `);
-    }
+      }
 
-    // Add spacing
-    $('#stp-modal-table').append(`
+      // Add spacing
+      $('#stp-modal-table').append(`
       <br>
       <br>
     `);
+    }
+  } else {
+    $('#modal-data-found').hide();
+    $('#modal-no-data-found').show();
   }
 }
 
-// `GET` Caregiver demographic data from `ajaxpage.php`
-const getCaregiverInfo = (recordId) => {
+// `GET` Patient demographic data from `ajaxpage.php`
+const getPatientInfo = (recordId) => {
   const urlParams = new URLSearchParams(window.location.search);
+  const { ajaxPage } = CB1;
   $.get({
-    url: CB1.ajaxpage,
+    url: ajaxPage,
     data: {
       recordId,
       instrument: urlParams.get('page'),
@@ -78,7 +81,7 @@ $(document).ready(() => {
   // TODO(mbentz-uf): Replace hardcoded margin percentage with flex-box
   jqTitleRow.append(
     $('<button />')
-      .html('Verify Caregiver')
+      .html('Verify Patient')
       .css(
         {
           'margin-left': '60%',
@@ -87,14 +90,14 @@ $(document).ready(() => {
       .attr(
         {
           type: 'button',
-          id: 'verify-caregiver',
+          id: 'verify-patient',
           class: 'btn btn-info btn-sm',
         },
       ),
   );
 
   // Add on-click listener to demographic check button
-  $('#verify-caregiver').on('click', () => {
+  $('#verify-patient').on('click', () => {
     // `recordId` is the equivalent of ADC Subject ID for the ADRC project
     const { adcSubjectId } = CB1;
     const recordId = $(`#${adcSubjectId}-tr input`).val();
@@ -103,57 +106,22 @@ $(document).ready(() => {
       return;
     }
 
-    getCaregiverInfo(recordId);
+    getPatientInfo(recordId);
   });
 });
 
-// function selectFromDropdown (key, value) {
-//   const $targetRow = $(`tr[sq_id='${key}']`)
-//   const $ac_target_field = $($targetRow.find('input')[0]) // ac = auto complete
-//   const $select_field = $(`select[name='${key}']`)
+function hideDataConfirmModal(approved) {
+  const { verifiedOnId } = CB1;
 
-//   // used to handle cases where the value provided is the displayed value of the desired option,
-//   // rather than the coded value (value attribute)
-//   const displayed_option_value = $select_field
-//     .children()
-//     .filter((i, e) => {
-//       return ($(e).html() == value)
-//     })
-//     .val()
+  // close the modal
+  $('#dialog-data-stp').dialog('close');
 
-//   // autocomplete fields
-//   if ($ac_target_field.attr('class') == 'x-form-text x-form-field rc-autocomplete ui-autocomplete-input') {
-//     // the non-coded value must be put in the text box to allow the user to see the pipe occured
-//     // if displayed_value is undefined, this function sets the value to nothing
-//     const displayed_value = $select_field
-//       .children(`[value='${value}']`)
-//       .html()
-//     $ac_target_field.val(displayed_value)
+  // Set the date of the verified on field
+  if (approved) {
+    $(`#${verifiedOnId}-tr input`).datepicker('setDate', new Date());
+    return;
+  }
 
-//     if ($ac_target_field.val() != value && displayed_option_value != undefined) {
-//       // TODO: handle the possibilty that this value could go in an "other" field behind branching logic
-//       $ac_target_field.val(value)
-//     }
-//     return
-//   }
-
-//   // non autocomplete fields
-//   $select_field.val(value)
-//   if ($select_field.val() != value && displayed_option_value != undefined) {
-//     // TODO: handle the possibilty that this value could go in an "other" field behind branching logic
-//     $select_field.val(displayed_option_value)
-//   }
-// }
-
-// function hideDataConfirmModal (isCopy) {
-//   // close the modal
-//   $('#dialog-data-stp').dialog('close')
-//   // get the data from the html
-//   const copydata = $('#dialog-data-stp').data('copyData')
-//   if (isCopy > 0) {
-//     // copy the data into the form
-//     pasteValues(copydata)
-//   }
-//   // clean up afterwards
-//   $('#dialog-data-stp').removeData('copyData')
-// }
+  $(`#${verifiedOnId}-tr input`).datepicker('setDate', null);
+  alert('The incorrect ADB Subject ID (ptid) was entered. Please enter the correct ptid before continuing.');
+}

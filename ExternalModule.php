@@ -1,19 +1,14 @@
 <?php
 
-namespace CBC\ExternalModule;
+namespace CB1\ExternalModule;
 
 use ExternalModules\AbstractExternalModule;
-use DataEntry;
-use MetaData;
-
-use function Sabre\Uri\split;
 
 class ExternalModule extends AbstractExternalModule
 {
 
     function redcap_every_page_top($project_id)
     {
-        // TODO(mbentz-uf): Verify if this is necessary
         if ($project_id && strpos(PAGE, 'ExternalModules/manager/project.php') !== false) {
             $this->setJsSettings([
                 'modulePrefix' => $this->PREFIX,
@@ -27,25 +22,24 @@ class ExternalModule extends AbstractExternalModule
 
     function redcap_data_entry_form_top($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance)
     {
-
         // only spawn search interface on specified form
         if (!in_array($instrument, (array) $this->framework->getProjectSetting('show_on_form'))) return;
         $target_pid = $this->framework->getProjectSetting('target_pid');
 
         $this->setJsSettings([
             'target_pid' => $target_pid,
-            'ajaxpage' => $this->framework->getUrl('ajaxpage.php'),
+            'ajaxPage' => $this->framework->getUrl('ajaxPage.php'),
             'adcSubjectId' => $this->framework->getProjectSetting('adc_subject_id')[0],
+            'verifiedOnId' => $this->framework->getProjectSetting('verified_on')[0],
         ]);
 
         $this->includeJs('js/custom_data_search.js');
-        // DataEntry::renderSearchUtility();
 
         include('data_confirm_modal.html');
         echo '</br>';
     }
 
-    function getCaregiverInfo($record_id, $instrument)
+    function getPatientInfo($record_id, $instrument)
     {
 
         if (!$record_id | !$instrument) return false;
@@ -161,52 +155,6 @@ class ExternalModule extends AbstractExternalModule
         return preg_replace('/\d{1,}\s{1}/', '', $select_choices_full_values[$index]);
     }
 
-    // Copied nearly exactly from the DataQuality class because it's a private function
-    // TODO: utilize DateTimeRC::datetimeConvert, but this does all the lifting
-    // private function convertDateFormat($field, $value)
-    // {
-    //     global $Proj;
-    //     // Get field validation type, if exists
-    //     $valType = $Proj->metadata[$field]['element_validation_type'];
-    //     // If field is a date[time][_seonds] field with MDY or DMY formatted, then reformat the displayed date for consistency
-    //     if (
-    //         $value != '' && !is_array($value) && substr($valType, 0, 4) == 'date'
-    //         && (substr($valType, -4) == '_mdy' || substr($valType, -4) == '_dmy')
-    //     ) {
-    //         // Get array of all available validation types
-    //         $valTypes = getValTypes();
-    //         $valTypes['date_mdy']['regex_php'] = $valTypes['date_ymd']['regex_php'];
-    //         $valTypes['date_dmy']['regex_php'] = $valTypes['date_ymd']['regex_php'];
-    //         $valTypes['datetime_mdy']['regex_php'] = $valTypes['datetime_ymd']['regex_php'];
-    //         $valTypes['datetime_dmy']['regex_php'] = $valTypes['datetime_ymd']['regex_php'];
-    //         $valTypes['datetime_seconds_mdy']['regex_php'] = $valTypes['datetime_seconds_ymd']['regex_php'];
-    //         $valTypes['datetime_seconds_dmy']['regex_php'] = $valTypes['datetime_seconds_ymd']['regex_php'];
-    //         // Set regex pattern to use for this field
-    //         $regex_pattern = $valTypes[$valType]['regex_php'];
-    //         // Run the value through the regex pattern
-    //         preg_match($regex_pattern, $value, $regex_matches);
-    //         // Was it validated? (If so, will have a value in 0 key in array returned.)
-    //         $failed_regex = (!isset($regex_matches[0]));
-    //         if ($failed_regex) return $value;
-    //         // Dates
-    //         if ($valType == 'date_mdy') {
-    //             $value = \DateTimeRC::date_ymd2mdy($value);
-    //         } elseif ($valType == 'date_dmy') {
-    //             $value = \DateTimeRC::date_ymd2dmy($value);
-    //         } else {
-    //             // Datetime and Datetime seconds
-    //             list($this_date, $this_time) = explode(" ", $value);
-    //             if ($valType == 'datetime_mdy' || $valType == 'datetime_seconds_mdy') {
-    //                 $value = trim(\DateTimeRC::date_ymd2mdy($this_date) . " " . $this_time);
-    //             } elseif ($valType == 'datetime_dmy' || $valType == 'datetime_seconds_dmy') {
-    //                 $value = trim(\DateTimeRC::date_ymd2dmy($this_date) . " " . $this_time);
-    //             }
-    //         }
-    //     }
-    //     // Return the value
-    //     return $value;
-    // }
-
     protected function includeJs($file)
     {
         echo '<script src="' . $this->getUrl($file) . '"></script>';
@@ -215,26 +163,6 @@ class ExternalModule extends AbstractExternalModule
     protected function setJsSettings($settings)
     {
         echo '<script>CB1 = ' . json_encode($settings) . ';</script>';
-    }
-
-    function digNestedData($subject_data_array, $key)
-    {
-        $value = null;
-        if (property_exists($subject_data_array, $key)) {
-            $value = $subject_data_array->{$key};
-        } else {
-            // keys nested in objects were not being found
-            array_walk_recursive(
-                $subject_data_array,
-                function ($v, $k) use ($key, &$value) {
-                    if ("$key" == "$k") {
-                        $value = $v;
-                    }
-                }
-            );
-        }
-
-        return $value;
     }
 
     function fetchMappings($instrument)

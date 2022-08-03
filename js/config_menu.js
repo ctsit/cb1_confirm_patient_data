@@ -7,7 +7,6 @@ const sampleMap = `[
 
 $(document).ready(() => {
   const sourceCodebook = `<a target='_blank' href='${app_path_webroot_full}${app_path_webroot.slice(1)}Design/data_dictionary_codebook.php?pid=${CB1.sourceProjectId}'><button>Source codebook</button></a>`;
-  // const targetCodebook = `<a target='_blank' href='${app_path_webroot_full}${app_path_webroot.slice(1)}Design/data_dictionary_codebook.php?pid=${CB1.thisProjectId}'><button>Target codebook</button></a>`;
   const $modal = $('#external-modules-configure-modal');
   let lastHoveredProjectID;
 
@@ -71,17 +70,17 @@ $(document).ready(() => {
   });
 });
 
-// function prettyPrint (element) {
-//   const $field = $(element).prev()
-//   const ugly = $field.val()
-//   if (ugly) {
-//     try {
-//       const pretty = JSON.stringify(JSON.parse(ugly), undefined, 2)
-//       $field.val(pretty)
-//     } catch (err) {
-//       if (err instanceof SyntaxError) {
-//         alert('There is an error in your JSON syntax:\n' + err.message)
-//       }
-//     }
-//   }
-// }
+function prettyPrint(element) {
+  const $field = $(element).prev();
+  const ugly = $field.val();
+  if (ugly) {
+    try {
+      const pretty = JSON.stringify(JSON.parse(ugly), undefined, 2);
+      $field.val(pretty);
+    } catch (err) {
+      if (err instanceof SyntaxError) {
+        alert(`There is an error in your JSON syntax:\n${err.message}`);
+      }
+    }
+  }
+}
