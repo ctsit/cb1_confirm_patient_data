@@ -10,15 +10,26 @@ function showDataConfirmModal(json) {
   $('#stp-modal-table').empty();
 
   if (json) {
+    const { adcSubjectId } = CB1;
+    const ptid = $(`#${adcSubjectId}-tr input`).val();
+
     for (const [index, person] of json.entries()) {
     // <th>Patient ${index + 1} Demographics</th>
       $('#stp-modal-table').append(`
-      <thead>
-          <th>Patient Demographics</th>
-          <th>Value</th>
-      </thead>
-      <tbody id='patient-${index}'></tbody>
-    `);
+        <thead>
+            <th>Patient Demographics</th>
+            <th>Value</th>
+        </thead>
+        <tbody id='patient-${index}'></tbody>
+      `);
+
+      // Add ptid as the first entry
+      $(`#patient-${index}`).append(`
+        <tr>
+          <td>ptid</td>
+          <td>${ptid}</td>
+        </tr>
+      `);
 
       // Add the rows from the current search
       for (const [key, value] of Object.entries(person)) {
