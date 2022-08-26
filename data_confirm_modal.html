@@ -1,22 +1,21 @@
-<div class="modal" id="dialog-data-stp" title="Confirm Data Copy">
-    <div class="modal-body" style="overflow: auto">
-        <div class="span12">
-            <p>Confirm the patient demographics with the caregiver</p>
-            <div>
-                <table class="table table-border table-sm">
-                    <thead>
-                        <th>Field</th>
-                        <th>Value</th>
-                    </thead>
-                    <tbody id="body-for-stp-modal">
-
-                    </tbody>
-                </table>
+<div class="modal" id="dialog-data-stp" title="Confirm patient demographics">
+    <div id="modal-no-data-found" style="display: none;" class="span12 text-center">
+        <br>
+        <h4>No data found for ptid.</h4>
+        <p class="text-center">Please check source project if record id exists.</p>
+    </div>
+    <section id="modal-data-found">
+        <div class="modal-body" style="overflow: auto">
+            <div class="span12">
+                <div>
+                    <table id="stp-modal-table" class="table table-border table-sm">
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-danger" onclick="hideDataConfirmModal(0)">Wrong</button>
-        <button type="button" class="btn btn-success" onclick="hideDataConfirmModal(1)">Correct</button>
-    </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-danger" onclick="hideDataConfirmModal(false)">Reject</button>
+            <button type="button" class="btn btn-success" onclick="hideDataConfirmModal(true)">Approve</button>
+        </div>
+    </section>
 </div>
