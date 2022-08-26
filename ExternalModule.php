@@ -33,7 +33,7 @@ class ExternalModule extends AbstractExternalModule
             'verifiedOnId' => $this->framework->getProjectSetting('verified_on')[0],
         ]);
 
-        $this->includeJs('js/custom_data_search.js');
+        $this->includeJs('js/app.js');
 
         include('data_confirm_modal.html');
         echo '</br>';
