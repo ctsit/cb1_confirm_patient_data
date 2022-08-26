@@ -1,7 +1,7 @@
 {
-    "name": "CBC Confirm Patient Data",
+    "name": "CB1 Confirm Patient Data",
     "description": "Display data from another project",
-    "namespace": "CBC\\ExternalModule",
+    "namespace": "CB1\\ExternalModule",
     "framework-version": 4,
     "redcap-version-min": "9.7.8",
     "permissions": [
@@ -52,6 +52,14 @@
                     "type": "field-list",
                     "required": true,
                     "repeatable": false,
+                    "autocomplete": true
+                },
+                {
+                    "key": "verified_on",
+                    "name": "Patient verified on field",
+                    "type": "field-list",
+                    "required": true,
+                    "repeatable": "false",
                     "autocomplete": true
                 },
                 {
