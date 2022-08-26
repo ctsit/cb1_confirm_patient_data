@@ -34,15 +34,15 @@ Access **Manage External Modules** section of your project, click on _Search and
     Note right of ExternalModule.php:Lifecycle hook triggered
     Note right of ExternalModule.php:includeJs('js/config_menu.js')
     Note right of ExternalModule.php:include('data_confirm_modal.html')
-    ExternalModule.php->>REDCap:Insert custom_data_search.js and data_confirm_modal.html into REDCap
-    REDCap-->>custom_data_search.js:Page load
-    custom_data_search.js-->>custom_data_search.js:$(document).ready()
-    Note right of custom_data_search.js:Page load event listener is triggered
-    custom_data_search.js->>REDCap:Add 'Verify Caregiver' to REDCap with on click event listener
-    REDCap-->>custom_data_search.js:'Verify Caregiver' button on click
-    custom_data_search.js->>ajaxpage.php:getCaregiverInfo(recordId)
+    ExternalModule.php->>REDCap:Insert app.js and data_confirm_modal.html into REDCap
+    REDCap-->>app.js:Page load
+    app.js-->>app.js:$(document).ready()
+    Note right of app.js:Page load event listener is triggered
+    app.js->>REDCap:Add 'Verify Caregiver' to REDCap with on click event listener
+    REDCap-->>app.js:'Verify Caregiver' button on click
+    app.js->>ajaxpage.php:getCaregiverInfo(recordId)
     ajaxpage.php-->>ExternalModule.php:getCaregiverInfo($record_id, $instrument)
     ExternalModule.php->>ajaxpage.php:Array of unique caregivers
-    ajaxpage.php-->>custom_data_search.js:JSON of array of unique caregivers
-    custom_data_search.js-->>REDCap:Update modal with caregivers and display
+    ajaxpage.php-->>app.js:JSON of array of unique caregivers
+    app.js-->>REDCap:Update modal with caregivers and display
 ```
