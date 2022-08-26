@@ -18,6 +18,11 @@
             "name": "Michael Bentz",
             "email": "mbentz@ufl.edu",
             "institution": "University of Florida - CTSI"
+        },
+	{
+            "name": "Kyle Chesney",
+            "email": "kyle.chesney@ufl.edu",
+            "institution": "University of Florida - CTSI"
         }
     ],
     "project-settings": [
