@@ -28,7 +28,7 @@ class ExternalModule extends AbstractExternalModule
 
         $this->setJsSettings([
             'target_pid' => $target_pid,
-            'ajaxPage' => $this->framework->getUrl('ajaxPage.php'),
+            'ajaxPage' => $this->framework->getUrl('ajaxpage.php'),
             'adcSubjectId' => $this->framework->getProjectSetting('adc_subject_id')[0],
             'verifiedOnId' => $this->framework->getProjectSetting('verified_on')[0],
         ]);

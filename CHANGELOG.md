@@ -1,6 +1,10 @@
 # Change Log
 All notable changes to CB1 Confirm Patient Data will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.3] - 2022-08-26
+### Changed 
+ - Fix typo in getUrl call
+
 ## [1.0.2] - 2022-08-26
 ### Added 
  - Added license (mbentz-uf)
