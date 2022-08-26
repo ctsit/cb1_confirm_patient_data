@@ -87,7 +87,7 @@ $(document).ready(() => {
     },
   });
 
-  const jqTitleRow = $('#contextMsg > div');
+  const jqTitleRow = $('#contextMsg > div:nth-child(1)');
 
   // TODO(mbentz-uf): Replace hardcoded margin percentage with flex-box
   jqTitleRow.append(
